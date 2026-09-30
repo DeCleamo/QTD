@@ -23,7 +23,6 @@ from qctd.config import NOISE_PRESETS, THRESHOLDS
 # ── page config ───────────────────────────────────────────────────────
 st.set_page_config(
     page_title="QCTD-QDS | Quantum Cyber Threat Detection",
-    page_icon="🔬",
     layout="wide",
 )
 
@@ -50,7 +49,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── sidebar ───────────────────────────────────────────────────────────
-st.sidebar.title("⚛️ QCTD-QDS")
+st.sidebar.title("QCTD-QDS")
 st.sidebar.caption("Quantum-Inspired Cyber Threat Detection Framework")
 st.sidebar.divider()
 
@@ -62,7 +61,8 @@ noise_level = st.sidebar.selectbox("Channel noise preset",
 
 st.sidebar.divider()
 st.sidebar.markdown("""
-**SIH Problem Statement 141**
+**Problem Statement 5**  
+*Egreen Quanta LLP — Theme: Security*
 
 Teleportation-based QDS with deterministic
 threshold-based threat detection.
@@ -91,13 +91,13 @@ def verdict_badge(v):
 #  TABS
 # ══════════════════════════════════════════════════════════════════════
 tabs = st.tabs([
-    "🏠 Overview",
-    "✍️ Signature",
-    "🔍 Verification",
-    "⚔️ Attacks",
-    "📊 Forgery Analysis",
-    "🛡️ Security Eval",
-    "📋 Session Log",
+    "Overview",
+    "Signature Generation",
+    "Verification",
+    "Attack Simulation",
+    "Forgery Analysis",
+    "Security Evaluation",
+    "Session Log",
 ])
 
 # ── TAB 0: Overview ──────────────────────────────────────────────────
@@ -135,7 +135,7 @@ with tabs[0]:
 with tabs[1]:
     st.header("Phase 1 — Quantum Signature Generation")
 
-    if st.button("🔑 Generate Signature", key="gen_sig"):
+    if st.button("Generate Signature", key="gen_sig"):
         sig = QuantumSignature(message, n_bits, signer_id="Alice")
         st.session_state["sig"] = sig
 
@@ -172,7 +172,7 @@ with tabs[2]:
         vinfo = sig.get_verification_info()
         noise = NOISE_PRESETS[noise_level] if noise_level != "none" else None
 
-        if st.button("▶️ Run Honest Verification", key="run_verify"):
+        if st.button("Run Honest Verification", key="run_verify"):
             meas = ProjectiveMeasurement()
             with st.spinner(f"Running {n_bits * n_trials} circuits…"):
                 result = meas.verify_signature(sig, vinfo, n_trials,
@@ -236,7 +236,7 @@ with tabs[3]:
             "Channel: Intercept-Resend", "Replay Attack",
         ])
 
-        if st.button("⚔️ Simulate Attack", key="run_attack"):
+        if st.button("Simulate Attack", key="run_attack"):
             meas = ProjectiveMeasurement()
             eng  = DecisionEngine()
 
@@ -311,7 +311,7 @@ with tabs[4]:
     fa_attempts = st.slider("Monte-Carlo attempts per attack", 5, 100, 20,
                              key="fa_attempts")
 
-    if st.button("📊 Run Forgery Analysis", key="run_forgery"):
+    if st.button("Run Forgery Analysis", key="run_forgery"):
         fa = ForgeryAnalyzer()
         progress = st.progress(0, text="Starting…")
         results = []
@@ -356,21 +356,41 @@ with tabs[4]:
         means = [r["mean_error_rate"] for r in results]
         stds  = [r["std_error_rate"] for r in results]
 
+        # Left chart: forgery success rate
+        # When all rates are 0 the bars are invisible, so we annotate instead
         colours = ["#00e676" if r == 0 else "#ff1744" for r in rates]
-        ax1.bar(names, rates, color=colours, edgecolor="white")
+        bars = ax1.bar(names, rates, color=colours, edgecolor="white",
+                       linewidth=0.5)
+        # Annotate each bar with its value
+        for i, (bar, rate) in enumerate(zip(bars, rates)):
+            label = f"{rate:.2%}"
+            colour = "#00e676" if rate == 0 else "#ff1744"
+            ax1.text(bar.get_x() + bar.get_width() / 2, rate + 0.003,
+                     label, ha="center", va="bottom", fontsize=10,
+                     fontweight="bold", color=colour)
         ax1.set_ylabel("Forgery Success Rate")
         ax1.set_title("Forgery Probability per Attack")
-        ax1.set_ylim(0, max(max(rates) * 1.5, 0.1))
+        ax1.set_ylim(0, max(max(rates) * 1.5, 0.12))
+        # Add a banner when all forgeries failed
+        if all(r == 0 for r in rates):
+            ax1.text(0.5, 0.55, "ALL FORGERIES BLOCKED\n(Success Rate: 0.0%)",
+                     transform=ax1.transAxes, ha="center", va="center",
+                     fontsize=14, fontweight="bold", color="#00e676",
+                     alpha=0.6,
+                     bbox=dict(boxstyle="round,pad=0.5", facecolor="#1a1a2e",
+                               edgecolor="#00e676", alpha=0.3))
 
+        # Right chart: error rate distribution with thresholds
         ax2.bar(names, means, yerr=stds, color="#42a5f5",
                 edgecolor="white", capsize=4)
         ax2.axhline(THRESHOLDS["accept"], color="#00e676", ls="--",
-                    label="Accept")
+                    label=f"Accept ({THRESHOLDS['accept']:.0%})")
         ax2.axhline(THRESHOLDS["reject"], color="#ff1744", ls="--",
-                    label="Reject")
+                    label=f"Reject ({THRESHOLDS['reject']:.0%})")
         ax2.set_ylabel("Mean Error Rate")
         ax2.set_title("Error Rate Distribution")
         ax2.legend(fontsize=8)
+        ax2.set_ylim(0, 1.05)
 
         plt.tight_layout()
         st.pyplot(fig)
@@ -385,7 +405,7 @@ with tabs[5]:
     col_a, col_b = st.columns(2)
 
     with col_a:
-        if st.button("🛡️ Run Security Evaluation", key="run_sec"):
+        if st.button("Run Security Evaluation", key="run_sec"):
             ev = FrameworkEvaluator()
             progress = st.progress(0, text="Evaluating…")
 
@@ -399,7 +419,7 @@ with tabs[5]:
             st.session_state["sec_eval"] = sec
 
     with col_b:
-        if st.button("⏱️ Run Performance Benchmark", key="run_perf"):
+        if st.button("Run Performance Benchmark", key="run_perf"):
             ev = FrameworkEvaluator()
             with st.spinner("Benchmarking…"):
                 perf = ev.evaluate_performance(message, n_bits, n_trials)
@@ -466,7 +486,7 @@ with tabs[6]:
 
     col1, col2 = st.columns([3, 1])
     with col2:
-        if st.button("🗑️ Clear Log", key="clear_log"):
+        if st.button("Clear Log", key="clear_log"):
             session.clear_history()
             st.rerun()
 
