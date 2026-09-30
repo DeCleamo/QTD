@@ -49,8 +49,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── sidebar ───────────────────────────────────────────────────────────
-st.sidebar.title("QCTD-QDS")
-st.sidebar.caption("Quantum-Inspired Cyber Threat Detection Framework")
+st.sidebar.title("QRYPTOPROTECH")
+st.sidebar.caption("Quantum-Inspired Cyber Threat Detection For Quantum Digital Signatures")
 st.sidebar.divider()
 
 message = st.sidebar.text_input("Message to sign", "Hello, Quantum World!")
