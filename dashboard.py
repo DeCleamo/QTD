@@ -22,7 +22,7 @@ from qctd.config import NOISE_PRESETS, THRESHOLDS
 
 # ── page config ───────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="QCTD-QDS | Quantum Cyber Threat Detection",
+    page_title="QRYPTPROTECH | Quantum Cyber Threat Detection",
     layout="wide",
 )
 
@@ -49,7 +49,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── sidebar ───────────────────────────────────────────────────────────
-st.sidebar.title("QRYPTOPROTECH")
+st.sidebar.title("QRYPTPROTECH")
 st.sidebar.caption("Quantum-Inspired Cyber Threat Detection For Quantum Digital Signatures")
 st.sidebar.divider()
 
